@@ -19,10 +19,11 @@ async def helpme(context): #context holds context on how this was called   help 
     
     await context.message.channel.send(embed=myEmbed)
 
-
-@client.command() #timer
+#timer
+@client.command()
 async def timer(ctx, time: int):
     await ctx.send("Starting timer")
+   
     def check(message):
         return message.channel == ctx.channel and message.author == ctx.author and message.content.lower() == "cancel"
     try:
@@ -34,30 +35,11 @@ async def timer(ctx, time: int):
 #check in
 @client.command(aliases=['clock', 'cl', 'clo'])
 async def clockin(context):
-    #df = pd.DataFrame({"Name":["hello", "test"]}) 
-    #df.to_csv('/Users/connie/Desktop/Discord Bot/output.csv')
-    df = pd.read_csv('output.csv', index_col=0) 
-    user = context.message.author
-    duplicate = False
-    index = 0
-    for i in df.index: 
-        if df.loc[i].User == str(user):
-            num = df.loc[i].Streaks 
-            df.at[i, "Streaks"] = num + 1
-            duplicate = True
-            df.to_csv('output.csv')
-            index = i
-            break
+    # fix this help me 
 
-    if not duplicate: 
-        df = df.append({"User": str(user),"Streaks": 1}, ignore_index=True)
-        df.to_csv('output.csv')
-    #df.at[i, "Streaks"] 
-    myEmbed = discord.Embed(description="this is how you've been studying", color=0xCC7178)
-    myEmbed.set_author(name=str(user), icon_url=user.avatar_url)
-    myEmbed.add_field(name="Days of Torture:", value=df.loc[index].Streaks, inline=False)
-    myEmbed.set_thumbnail(url=user.avatar_url)
-    await context.message.channel.send(embed=myEmbed)
+
+    
+    
 
 @client.command(aliases=['8ball', 'eightball'])
 async def _8ball(context, *, question):
@@ -75,8 +57,7 @@ async def motivation(context):
                 'https://www.simplyhired.com/job/ysJa3CVKw2hqGEy_9xHRPiyTf-7LRL2Ev85rnHfL92zGx91khsgM6w?isp=1&sjdu=cnx0XGv_IhRgPmexAqJH77xfXIh50tCaD6N0YSs5xxol7_T3JjVL2i47IZsI2WvM1foGwFy0cw4-ZiSeawSz3020uYrXcLNyuHkB_sm5WpPVw4qeChl0URcxu0lJf_NE7fq9erz_8jnam2qQEuJWUOg10g&advNum=1071146325689980&q=vomit+cleaner',
                 'https://www.indeed.com/viewjob?cmp=DoodyCalls---Central-Jersey&t=Pooper+Scooper&jk=44ea8479ca800379&sjdu=QwrRXKrqZ3CNX5W-O9jEvfL5Z989XHr2tDhrH0FUmcC2oZAzX2y4YI5AeKVxDA8n1fzC1lgHxnXH1bEa0f7En3MXPbjNQnbtC4kUdGsQSi4&tk=1emits9vl34nb000&adid=329724429&ad=-6NYlbfkN0AsBQcbsuNMq7_Pd5WiFPsuRq_2eGkX1lcVGQzgkDJxvi_2jcvJeha7vApRUJVKsTtYpKCzuly3y3c2tuFayIoGehp66wrwMT0Z_LCW1wgMKvLaXEtRi20Px5WLHyJxoaH5zlSnjzI9WZnVJSidn0krcQ_OQPj6yrIDOXXsej3JANjGQawBIwUkcPx7A-u4acm2ul6mCyDsNlXQVpo0-ZWvQJ_dN1B5QNepvRL0buStDO3c4crwKmGpws4G6et6UhF2fmF--vRo4tPifty_b3BpdtEw8G9mEvd_yFikkVCOxzgsXYuRjJcn5oSg2pfQmZX2M9_9y4XeBg-vXfcTmIgB&pub=4a1b367933fd867b19b072952f68dceb&vjs=3',
                 'https://www.indeed.com/viewjob?cmp=Family-Counseling-Center-of-the-CSRA&t=Urine+Drug+Screen+Collector+Observer&jk=3c36cd5e860cfae4&q=Urine+Drug+Specimen+Collector&vjs=3',
-                'idk man, life struggle struggly and then you gurgle gurgle',
-                "when life gives you lemons you eat poo"]
+                ]
     await context.message.channel.send(f'You have a bright future ahead:\n{random.choice(responses)}')
 
 #error
@@ -91,7 +72,7 @@ async def _8ball_error(context, error):
     if isinstance(error, commands.MissingRequiredArgument):
         await context.message.channel.send('u didnt ask me a question')
 
-#sends msg to general whesn bot joins server
+#sends msg to general when bot joins server
 @client.event
 async def on_connect():
     #retrieving the channel we want access to
@@ -99,14 +80,26 @@ async def on_connect():
     for guild in client.guilds:
         for channel in guild.text_channels: 
             text_channel.append(client.get_channel(channel.id))
-            
-    general = text_channel[0]
-    await general.send('im here, oWo')
+            break
+    
+    for ind in range(len(text_channel)):
+        general = text_channel[ind]
+        await general.send('im here, oWo')
 
 #sets the status of bot when it's online
 @client.event
 async def on_ready():
+    text_channel = [] 
+    for guild in client.guilds:
+        for channel in guild.text_channels: 
+            text_channel.append(client.get_channel(channel.id))
+            break
+    
+    for ind in range(len(text_channel)):
+        general = text_channel[ind]
+        await general.send('im running')
+
     await client.change_presence(status=discord.Status.do_not_disturb, activity=discord.Activity(type=discord.ActivityType.watching, name="you study"))
 
 #run the client on the server 
-client.run('Nzc0Njg1NjYyMzcyMTY3NzQx.X6bYPg.kdrmOHN7C0_hDiqsYGFt2uqMhgI') #takes in the token that allows to connect from bot that we coded to the server 
+client.run('Nzc0Njg1NjYyMzcyMTY3NzQx.X6bYPg.g-RgYMvWiUJkyVYQvRh2wh90csQ') #takes in the token that allows to connect from bot that we coded to the server 
